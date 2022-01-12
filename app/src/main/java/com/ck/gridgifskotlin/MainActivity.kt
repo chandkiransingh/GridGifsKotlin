@@ -10,13 +10,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AbsListView
-import android.widget.AdapterView.OnItemClickListener
-import android.widget.GridView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.ck.gridgifskotlin.Interfaces.ImagesAPI
 import com.ck.gridgifskotlin.Interfaces.ReterofitHelper
 import com.ck.gridgifskotlin.MyAdapters.ImageAdapter
+import com.ck.gridgifskotlin.MyAdapters.ThumbnailAdapter
 import com.ck.gridgifskotlin.MyClasses.AppDatabase
 import com.ck.gridgifskotlin.MyClasses.ImagesData
 import com.ck.gridgifskotlin.MyClasses.ImagesDataOffline
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private var start = 0
     private var end = 25
     private var offset = 0
-    var gridview: GridView? = null
+    var gridview: RecyclerView? = null
     var imglist: ArrayList<ImagesData> = ArrayList<ImagesData>()
     var imgAdapter: ImageAdapter? = null
     var connected = false
@@ -62,39 +63,17 @@ class MainActivity : AppCompatActivity() {
 //        loading = findViewById<View>(R.id.progressBar) as ProgressBar
 //        var loadingbar: ProgressBar? = loading
 
-        gridview = findViewById<View>(R.id.gridview) as GridView
+        gridview = findViewById(R.id.gridview) as RecyclerView
 //        gridview.setAdapter(new ImageAdapter(this));
 
-        //        gridview.setAdapter(new ImageAdapter(this));
-        gridview!!.onItemClickListener =
-            OnItemClickListener { parent, v, position, id ->
-                val i = Intent(applicationContext, SingleViewActivity::class.java)
-                i.putExtra("id", position)
-                i.putExtra("url", imgAdapter!!.getItem(position).toString())
-                startActivity(i)
-            }
-
-        gridview!!.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(absListView: AbsListView, i: Int) {
-                Log.d(
-                    ContentValues.TAG,
-                    "onScrollStateChanged: " + gridview!!.getChildAt(i).bottom + " ................." + (gridview!!.height + gridview!!.scrollY)
-                )
-                if (!gridview!!.canScrollVertically(1)) {
-                    // bottom of scroll view
-                    Log.d(ContentValues.TAG, "onScrollStateChanged: bottom")
+        gridview!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!recyclerView.canScrollVertically(1)) {
                     if (connected) {
                         loadNextDataFromApi()
                     }
                 }
-                if (!gridview!!.canScrollVertically(-1)) {
-                    // top of scroll view
-                    Log.d(ContentValues.TAG, "onScrollStateChanged: Top")
-                }
-            }
-
-            override fun onScroll(absListView: AbsListView, i: Int, i1: Int, i2: Int) {
-//                Toast.makeText(MainActivity.this, "Scrolling", Toast.LENGTH_SHORT).show();
             }
         })
 
@@ -127,87 +106,9 @@ class MainActivity : AppCompatActivity() {
         )
         Log.d(ContentValues.TAG, "getGifs: url got here is $uri and offset here is $offset")
 
-//        val stringRequest = StringRequest(
-//            Request.Method.GET, uri,
-//            { response ->
-//                Log.d(ContentValues.TAG, "onResponse: response is $response")
-//                var jsonobject: JSONObject? = null
-//                try {
-//                    jsonobject = JSONObject(response)
-//                    val dataArray = jsonobject.getJSONArray("data")
-//                    var imageObject: JSONObject? = null
-//                    var allImages: JSONObject? = null
-//                    var imagePropery: JSONObject? = null
-//                    var urlGif = ""
-//                    var previewUrlGif = ""
-//                    val size = dataArray.length()
-//                    if (size > 0) {
-//                        for (i in 0 until size) {
-//                            imageObject = dataArray[i] as JSONObject
-//                            Log.d(
-//                                ContentValues.TAG,
-//                                "onResponse: imageobject is $imageObject"
-//                            )
-//                            allImages = imageObject.getJSONObject("images")
-//                            imagePropery = allImages.getJSONObject("original")
-//                            urlGif = imagePropery["url"] as String
-//                            Log.d(
-//                                ContentValues.TAG,
-//                                "onResponse: original gif url is $urlGif"
-//                            )
-//                            imagePropery = allImages.getJSONObject("preview_webp")
-//                            previewUrlGif = imagePropery["url"] as String
-//                            Log.d(
-//                                ContentValues.TAG,
-//                                "onResponse: preview gif url is $previewUrlGif"
-//                            )
-//                            imgData = ImagesData(urlGif, previewUrlGif)
-//                            imglist.add(imgData!!)
-//                            saveNewImage(urlGif, previewUrlGif)
-//                            loading!!.dismiss()
-//                        }
-////                        Log.d(
-////                            ContentValues.TAG,
-//////                            "onResponse: imgData.getPreviewImage() " + imgData.getPreviewImage()
-////                        )
-//                        imgAdapter = ImageAdapter(this@MainActivity, imglist)
-//                        gridview!!.setAdapter(imgAdapter)
-//                        if (start > 0) {
-//                            gridview!!.smoothScrollToPosition(start + 25)
-//                        }
-//                    } else {
-//                        Toast.makeText(
-//                            this@MainActivity,
-//                            "Sorry no more images found",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        loading!!.dismiss()
-//                    }
-//                } catch (e: JSONException) {
-//                    e.printStackTrace()
-//                    Log.d(ContentValues.TAG, "onResponse: Crashed json")
-//                    loading!!.dismiss()
-//                    Toast.makeText(this@MainActivity, "Something went wrong", Toast.LENGTH_SHORT)
-//                        .show()
-//                }
-//            }
-//        ) {
-//            Toast.makeText(this@MainActivity, "Sorry no more images found", Toast.LENGTH_SHORT).show()
-//            loading!!.dismiss()
-//        }
-//        val socketTimeout = 30000
-//        val policy: RetryPolicy = DefaultRetryPolicy(
-//            socketTimeout,
-//            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-//            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-//        )
-//        stringRequest.retryPolicy = policy
-//        ApplicationController.instance!!.addToRequestQueue(stringRequest)
-
-
         //retrofit
-
         val ImagesApi = ReterofitHelper.getInstances().create(ImagesAPI::class.java)
+
         GlobalScope.launch {
             val result = ImagesApi.getImages("ihGPS35stL0VhASRNPAc6feokYuiTsCV", 25, "g", start)
             if (result != null) {
@@ -230,15 +131,15 @@ class MainActivity : AppCompatActivity() {
                             "onResponse: preview gif url is $previewUrlGif"
                         )
                         imgData = ImagesData(urlGif, previewUrlGif)
-                        imglist.add(imgData!!)
-//                        saveNewImage(urlGif, previewUrlGif)
+                        if (!imglist.contains(imgData)) {
+                            imglist.add(imgData!!)
+                        }
+                        saveNewImage(urlGif, previewUrlGif)
                         loading!!.dismiss()
                     }
-                    Log.d(TAG, "onResponse: imgData.getPreviewImage() " + imgData)
-                    imgAdapter = ImageAdapter(this@MainActivity, imglist)
-                    gridview!!.adapter = imgAdapter
-                    if (start > 0) {
-                        gridview!!.smoothScrollToPosition(start + 25)
+                    Log.d(TAG, "onResponse: imgData.getPreviewImage()" + imgData)
+                    runOnUiThread {
+                        setAdapterData(imglist)
                     }
                 } else {
                     Toast.makeText(
@@ -249,7 +150,8 @@ class MainActivity : AppCompatActivity() {
                     loading!!.dismiss()
                 }
             } else {
-                Toast.makeText(this@MainActivity, "Something went wrong", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Something went wrong", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
@@ -289,8 +191,51 @@ class MainActivity : AppCompatActivity() {
                 imglist.add(imgData!!)
             }
         }
-        imgAdapter = ImageAdapter(this@MainActivity, imglist)
+        setAdapterData(imglist)
+//        imgAdapter = ImageAdapter(this@MainActivity, imglist)
         Log.d(ContentValues.TAG, "getLocalImages: images get here $images")
-        gridview!!.adapter = imgAdapter
+//        gridview!!.adapter = imgAdapter
     }
+
+    fun setAdapterData(imglist: ArrayList<ImagesData>) {
+        val adapter = ThumbnailAdapter(this@MainActivity)
+        val staggeredGridLayoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        staggeredGridLayoutManager.gapStrategy =
+            StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        gridview!!.layoutManager = staggeredGridLayoutManager
+        gridview!!.setHasFixedSize(true)
+        gridview!!.setItemViewCacheSize(imglist.size)
+        gridview!!.isDrawingCacheEnabled = true
+        gridview!!.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
+        gridview!!.adapter = adapter
+        gridview!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int
+            ) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    gridview?.invalidateItemDecorations()
+                }
+            }
+        })
+
+        adapter.setData(imglist)
+
+        Log.d(TAG, "setAdapterData: scroll to position " + start)
+        gridview!!.smoothScrollToPosition(offset*25)
+
+        adapter.setOnClickListener(object : ThumbnailAdapter.OnClickListener {
+            override fun onClick(v: View, position: Int) {
+                val intent = Intent(this@MainActivity, SingleViewActivity::class.java)
+                intent.putExtra("url", imglist[position].originalImage)
+                startActivity(intent)
+            }
+        })
+    }
+
+}
+
+private fun RecyclerView.setOnScrollListener(onScrollListener: AbsListView.OnScrollListener) {
+
 }

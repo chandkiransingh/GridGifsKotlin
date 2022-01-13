@@ -120,16 +120,10 @@ class MainActivity : AppCompatActivity() {
                         val allImages = it.images
                         val imagePropery = allImages.original
                         val urlGif = imagePropery.url
-                        Log.d(
-                            ContentValues.TAG,
-                            "onResponse: original gif url is $urlGif"
-                        )
-                        val imageProperyPreview = allImages.preview_webp
+                        Log.d(ContentValues.TAG, "onResponse: original gif url is $urlGif")
+                        val imageProperyPreview = allImages.preview_gif
                         val previewUrlGif = imageProperyPreview.url
-                        Log.d(
-                            ContentValues.TAG,
-                            "onResponse: preview gif url is $previewUrlGif"
-                        )
+                        Log.d(ContentValues.TAG, "onResponse: preview gif url is $previewUrlGif")
                         imgData = ImagesData(urlGif, previewUrlGif)
                         if (!imglist.contains(imgData)) {
                             imglist.add(imgData!!)
@@ -154,6 +148,9 @@ class MainActivity : AppCompatActivity() {
                     .show()
             }
         }
+//        runOnUiThread {
+//            setAdapterData(imglist)
+//        }
 
     }
 
@@ -223,7 +220,7 @@ class MainActivity : AppCompatActivity() {
         adapter.setData(imglist)
 
         Log.d(TAG, "setAdapterData: scroll to position " + start)
-        gridview!!.smoothScrollToPosition(offset*25)
+        gridview!!.smoothScrollToPosition(offset * 25)
 
         adapter.setOnClickListener(object : ThumbnailAdapter.OnClickListener {
             override fun onClick(v: View, position: Int) {

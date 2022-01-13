@@ -66,4 +66,7 @@ dependencies {
 
     //picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'
+
+    //drawable gif
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.+'
 }

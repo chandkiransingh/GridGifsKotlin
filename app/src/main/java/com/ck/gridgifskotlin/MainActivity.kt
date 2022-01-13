@@ -28,14 +28,12 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
-    //    var loading: ProgressBar? = null
     var loading: ProgressDialog? = null
     private var start = 0
     private var end = 25
     private var offset = 0
     var gridview: RecyclerView? = null
     var imglist: ArrayList<ImagesData> = ArrayList<ImagesData>()
-    var imgAdapter: ImageAdapter? = null
     var connected = false
     var imgData: ImagesData? = null
 
@@ -46,7 +44,6 @@ class MainActivity : AppCompatActivity() {
         TinyDancer.create()
             .show(this@MainActivity)
 
-        //alternatively
         TinyDancer.create()
             .redFlagPercentage(.1f)
             .startingXPosition(200)
@@ -54,17 +51,13 @@ class MainActivity : AppCompatActivity() {
             .show(this@MainActivity)
         TinyDancer.create()
             .addFrameDataCallback { previousFrameNS, currentFrameNS, droppedFrames ->
-                //collect your stats here
             }
             .show(this@MainActivity)
 
         loading = ProgressDialog(this@MainActivity)
         loading!!.setMessage("Please wait.....")
-//        loading = findViewById<View>(R.id.progressBar) as ProgressBar
-//        var loadingbar: ProgressBar? = loading
 
         gridview = findViewById(R.id.gridview) as RecyclerView
-//        gridview.setAdapter(new ImageAdapter(this));
 
         gridview!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -106,11 +99,10 @@ class MainActivity : AppCompatActivity() {
         )
         Log.d(ContentValues.TAG, "getGifs: url got here is $uri and offset here is $offset")
 
-        //retrofit
-        val ImagesApi = ReterofitHelper.getInstances().create(ImagesAPI::class.java)
+        val imagesApi = ReterofitHelper.getInstances().create(ImagesAPI::class.java)
 
         GlobalScope.launch {
-            val result = ImagesApi.getImages("ihGPS35stL0VhASRNPAc6feokYuiTsCV", 25, "g", start)
+            val result = imagesApi.getImages("ihGPS35stL0VhASRNPAc6feokYuiTsCV", 25, "g", start)
             if (result != null) {
                 Log.d(TAG, "getGifs: result body is " + result.body().toString())
                 val gotResponse = result.body()

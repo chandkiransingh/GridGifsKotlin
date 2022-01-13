@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestOptions
 import com.ck.gridgifskotlin.MyClasses.ImagesData
 import com.ck.gridgifskotlin.R
-import pl.droidsonroids.gif.GifImageView
 
 
 class ThumbnailAdapter(private val context: Context) : RecyclerView.Adapter<ThumbnailAdapter.ViewHolder>() {
@@ -50,8 +50,13 @@ class ThumbnailAdapter(private val context: Context) : RecyclerView.Adapter<Thum
             ivImage.requestLayout()
             Log.d("TAG", "onBind: "+thumbnail)
 
+            val options: RequestOptions = RequestOptions()
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.loader_test)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH)
 
-            Glide.with(context).load(thumbnail).diskCacheStrategy(DiskCacheStrategy.DATA).into(ivImage)
+            Glide.with(context).load(thumbnail).apply(options).into(ivImage)
 
             view.setOnClickListener {
                 onClickListener?.onClick(it, position)
